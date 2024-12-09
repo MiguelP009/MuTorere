@@ -1,12 +1,18 @@
 #include "../include/ReinforcementLearningAgent.hpp"
 #include <algorithm>
+#include <iostream>
 
 ReinforcementLearningAgent::ReinforcementLearningAgent(int playerId, double alpha, double gamma, double epsilon)
     : Agent(playerId), alpha(alpha), gamma(gamma), epsilon(epsilon) {}
 
 int ReinforcementLearningAgent::chooseMove(const MuTorereBoard& board) {
     int state = getStateHash(board);
-    std::vector<int> availableMoves = board.getAvailableMoves();
+    std::vector<int> availableMoves = board.getAvailableMoves(playerId);
+
+    // Print available moves
+    for (int i=0; i<availableMoves.size(); i++) {
+        std::cout << availableMoves[i] << " " << std::endl;
+    }
 
     // Politique epsilon-greedy
     if ((double) rand() / RAND_MAX < epsilon) {
@@ -26,7 +32,7 @@ void ReinforcementLearningAgent::updateQValues(int reward, const MuTorereBoard& 
     double maxFutureQ = 0.0;
 
     // Obtenir la Q-valeur maximum pour le nouvel état
-    std::vector<int> newMoves = newBoard.getAvailableMoves();
+    std::vector<int> newMoves = newBoard.getAvailableMoves(playerId);
     for (int newMove : newMoves) {
         maxFutureQ = std::max(maxFutureQ, qValues[{newState, newMove}]);
     }
@@ -37,7 +43,7 @@ void ReinforcementLearningAgent::updateQValues(int reward, const MuTorereBoard& 
 
 int ReinforcementLearningAgent::getBestMove(const MuTorereBoard& board) {
     int state = getStateHash(board);
-    std::vector<int> availableMoves = board.getAvailableMoves();
+    std::vector<int> availableMoves = board.getAvailableMoves(playerId);
 
     int bestMove = availableMoves[0];
     double bestQValue = qValues[{state, bestMove}];
