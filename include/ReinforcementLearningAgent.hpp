@@ -13,6 +13,10 @@ public:
     ReinforcementLearningAgent(int playerId, double alpha = 0.1, double gamma = 0.9, double epsilon = 0.1);
     int chooseMove(const MuTorereBoard& board) override;
     void updateQValues(int reward, const MuTorereBoard& oldBoard, int move, const MuTorereBoard& newBoard);
+    void saveQValues(const std::string& filename) const;
+    void loadQValues(const std::string& filename);
+
+
 
 private:
     std::map<std::pair<int, int>, double> qValues; // Table des Q-valeurs pour (état, action)

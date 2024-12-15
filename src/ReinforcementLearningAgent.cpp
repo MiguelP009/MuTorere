@@ -1,6 +1,8 @@
 #include "../include/ReinforcementLearningAgent.hpp"
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 ReinforcementLearningAgent::ReinforcementLearningAgent(int playerId, double alpha, double gamma, double epsilon)
     : Agent(playerId), alpha(alpha), gamma(gamma), epsilon(epsilon) {}
@@ -10,9 +12,9 @@ int ReinforcementLearningAgent::chooseMove(const MuTorereBoard& board) {
     std::vector<int> availableMoves = board.getAvailableMoves(playerId);
 
     // Print available moves
-    for (int i=0; i<availableMoves.size(); i++) {
-        std::cout << availableMoves[i] << " " << std::endl;
-    }
+    // for (int i=0; i<availableMoves.size(); i++) {
+    //     std::cout << availableMoves[i] << " " << std::endl;
+    // }
 
     // Politique epsilon-greedy
     if ((double) rand() / RAND_MAX < epsilon) {
@@ -66,4 +68,54 @@ int ReinforcementLearningAgent::getStateHash(const MuTorereBoard& board) const {
         hash = hash * 3 + pos; // Utilise chaque position pour créer un identifiant unique
     }
     return hash;
+}
+
+
+void ReinforcementLearningAgent::saveQValues(const std::string& filename) const {
+    std::ofstream outFile(filename);
+
+    if (!outFile.is_open()) {
+        std::cerr << "Error: Could not open file for saving Q-values." << std::endl;
+        return;
+    }
+
+    // En-tête
+    outFile << "State,Action,QValue" << std::endl;
+
+    // Sauvegarder chaque Q-valeur
+    for (const auto& entry : qValues) {
+        int state = entry.first.first;
+        int action = entry.first.second;
+        double qValue = entry.second;
+        outFile << state << "," << action << "," << qValue << std::endl;
+    }
+
+    outFile.close();
+    std::cout << "Q-values saved to " << filename << "." << std::endl;
+}
+
+void ReinforcementLearningAgent::loadQValues(const std::string& filename) {
+    std::ifstream inFile(filename);
+
+    if (!inFile.is_open()) {
+        std::cerr << "Error: Could not open file for loading Q-values." << std::endl;
+        return;
+    }
+
+    std::string line;
+    std::getline(inFile, line); // Ignorer l'en-tête
+
+    while (std::getline(inFile, line)) {
+        std::istringstream ss(line);
+        int state, action;
+        double qValue;
+
+        char delimiter;
+        ss >> state >> delimiter >> action >> delimiter >> qValue;
+
+        qValues[{state, action}] = qValue;
+    }
+
+    inFile.close();
+    std::cout << "Q-values loaded from " << filename << "." << std::endl;
 }
