@@ -1,11 +1,12 @@
 # Mu Torere AI Project
 
-This project implements the traditional **Mu Torere** board game with artificial intelligence agents to experiment with reinforcement learning (RL). The goal is to pit a reinforcement learning agent against a random agent or another RL agent and analyze its learning process.
+This project implements the traditional **Mu Torere** board game with artificial intelligence agents to experiment with reinforcement learning (RL). The goal is to pit a reinforcement learning agent against a random agent, another RL agent, or a human player, and analyze its learning process.
 
 ## Features
 - **Game Simulation**: Implements the Mu Torere board game logic.
 - **Reinforcement Learning Agent**: Learns optimal strategies using Q-learning.
 - **Random Agent**: Provides a simple baseline for comparison.
+- **RealPlayerAgent**: Allows a human player to interact with the game via the console.
 - **Training Data Analysis**: Includes a Python tool for visualizing the learning process.
 
 ---
@@ -18,14 +19,71 @@ This project implements the traditional **Mu Torere** board game with artificial
 - **Libraries**:
   - Python: `pandas`, `matplotlib` (install with `pip install pandas matplotlib`).
 
-### Running the Simulation
-1. Compile and execute the C++ project:
+---
+
+## Running the Simulation
+
+### Compilation
+Compile the C++ project:
+```bash
+g++ -std=c++17 -o mu_torere_simulation src/*.cpp
+```
+
+### Command-Line Options
+Run the simulation with the following command:
+```bash
+./mu_torere_simulation [OPTIONS]
+```
+
+#### Available Options:
+- **Agent Types**:
+  - `--agent1 [random|rl|real]`: Type of Agent 1.
+  - `--agent2 [random|rl|real]`: Type of Agent 2.
+  - Example: `--agent1 rl --agent2 random`
+- **Number of Games**:
+  - `--games <n>`: Number of games to play (default: 1000).
+  - Example: `--games 500`
+- **Training**:
+  - `--train`: Enables training for RL agents.
+  - Example: `--train`
+- **Saving and Loading Q-values**:
+  - `--export-qvalues <file>`: Save Q-values to the specified file.
+  - `--load-qvalues <file>`: Load Q-values from the specified file.
+  - Example: `--export-qvalues qvalues.csv` or `--load-qvalues pretrained.csv`
+- **Results Output**:
+  - `--output-results <file>`: Save game results to the specified file.
+  - Example: `--output-results results.csv`
+- **Help**:
+  - `--help`: Display help information about the command-line options.
+
+---
+
+### Examples
+
+1. **Random agent vs RL agent (100 games)**:
    ```bash
-   g++ -std=c++17 -o mu_torere_simulation src/*.cpp
-   ./mu_torere_simulation
+   ./mu_torere_simulation --agent1 random --agent2 rl --games 100
    ```
 
-2. Use the Python analysis tool to visualize results (explained below).
+2. **Train two RL agents and save Q-values**:
+   ```bash
+   ./mu_torere_simulation --agent1 rl --agent2 rl --games 10000 --train --export-qvalues qvalues.csv
+   ```
+
+3. **Load pretrained Q-values and play RL agent vs random agent**:
+   ```bash
+   ./mu_torere_simulation --agent1 rl --agent2 random --load-qvalues qvalues.csv --games 500
+   ```
+
+4. **Human player vs RL agent**:
+   ```bash
+   ./mu_torere_simulation --agent1 real --agent2 rl --games 1
+   ```
+
+5. **Two human players**:
+   ```bash
+   ./mu_torere_simulation --agent1 real --agent2 real --games 1
+   ```
 
 ---
 
@@ -53,6 +111,7 @@ mu-torere/
 2. **Agents**:
    - `ReinforcementLearningAgent`: Learns using Q-learning.
    - `RandomAgent`: Chooses moves randomly.
+   - `RealPlayerAgent`: Allows human players to interact with the game via the console.
 
 3. **Training**:
    - Allows two agents to compete for thousands of games to train the RL agent.
@@ -88,4 +147,3 @@ The `analysis_tool.py` script allows you to:
 - **Graph 2**: Win rate with a trend line to observe learning stability.
 
 ---
-
