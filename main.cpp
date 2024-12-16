@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
     if (agent1Type == "random") {
         player1 = new RandomAgent(1);
     } else if (agent1Type == "rl") {
-        auto* rlAgent1 = new ReinforcementLearningAgent(1, 0.1, 0.9, 0.2);
+        auto* rlAgent1 = new ReinforcementLearningAgent(1, 0.3, 0.8, 1.0, 0.99, 0.1);
         if (!qvaluesLoadFile.empty()) {
             rlAgent1->loadQValues(qvaluesLoadFile);
         }
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     if (agent2Type == "random") {
         player2 = new RandomAgent(2);
     } else if (agent2Type == "rl") {
-        auto* rlAgent2 = new ReinforcementLearningAgent(2, 0.1, 0.9, 0.2);
+        auto* rlAgent2 = new ReinforcementLearningAgent(1, 0.3, 0.8, 1.0, 0.99, 0.1);
         if (!qvaluesLoadFile.empty()) {
             rlAgent2->loadQValues(qvaluesLoadFile);
         }
@@ -114,6 +114,9 @@ int main(int argc, char* argv[]) {
     std::vector<double> totalRewardsPlayer1;
     std::vector<double> totalRewardsPlayer2;
     std::vector<int> results;
+    int wins = 0, losses = 0, draws = 0;
+    std::vector<double> winRates;
+    int windowSize = 100;
 
     // Lancer les jeux
     for (int i = 0; i < numGames; ++i) {
@@ -129,6 +132,37 @@ int main(int argc, char* argv[]) {
             else{
                 std::cout << "You lose!\n";
             }
+
+        }
+
+        // Mise à jour des résultats
+        if (results.back() == 1) {
+            ++wins;
+        } else if (results.back() == 2) {
+            ++losses;
+        } else {
+            ++draws;
+        }
+
+        // Calcul du winrate tous les `windowSize` épisodes
+        if ((i + 1) % windowSize == 0) {
+            double winRate = static_cast<double>(wins) / windowSize;
+            winRates.push_back(winRate);
+
+            std::cout << "Win rate (last " << windowSize << " games): " << winRate << std::endl;
+
+            // Réinitialisation pour la prochaine fenêtre
+            wins = 0;
+            losses = 0;
+            draws = 0;
+        }
+
+        // Décroissance de l'epsilon pour les agents RL
+        if (auto* rlAgent1 = dynamic_cast<ReinforcementLearningAgent*>(player1)) {
+            rlAgent1->decayEpsilon();
+        }
+        if (auto* rlAgent2 = dynamic_cast<ReinforcementLearningAgent*>(player2)) {
+            rlAgent2->decayEpsilon();
         }
         
     }
@@ -148,15 +182,16 @@ int main(int argc, char* argv[]) {
 
     // Ajouter les en-têtes dynamiquement
     outFile << "Game";
-    if (player1IsRL) outFile << ",TotalRewardPlayer1";
+    if (player1IsRL) outFile << ",TotalReward";
     if (player2IsRL) outFile << ",TotalRewardPlayer2";
-    outFile << ",Winner\n";
+    outFile << ",WinRate\n";
 
     for (size_t i = 0; i < totalRewardsPlayer1.size(); ++i) {
+        double winRate = (i / windowSize < winRates.size()) ? winRates[i / windowSize] : winRates.back();
         outFile << i + 1;
         if (player1IsRL) outFile << "," << totalRewardsPlayer1[i];
         if (player2IsRL) outFile << "," << totalRewardsPlayer2[i];
-        outFile << "," << results[i] << "\n";
+        outFile << "," << winRate << "\n";
     }
     outFile.close();
 

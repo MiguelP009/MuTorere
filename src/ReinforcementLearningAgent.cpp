@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-ReinforcementLearningAgent::ReinforcementLearningAgent(int playerId, double alpha, double gamma, double epsilon)
+ReinforcementLearningAgent::ReinforcementLearningAgent(int playerId, double alpha, double gamma, double epsilon, double epsilonDecay, double minEpsilon)
     : Agent(playerId), alpha(alpha), gamma(gamma), epsilon(epsilon) {}
 
 int ReinforcementLearningAgent::chooseMove(const MuTorereBoard& board) {
@@ -113,4 +113,10 @@ void ReinforcementLearningAgent::loadQValues(const std::string& filename) {
 
     inFile.close();
     std::cout << "Q-values loaded from " << filename << "." << std::endl;
+}
+
+
+void ReinforcementLearningAgent::decayEpsilon() {
+    epsilon = std::max(minEpsilon, epsilon * epsilonDecay);
+    //std::cout << "Epsilon updated: " << epsilon << std::endl;
 }

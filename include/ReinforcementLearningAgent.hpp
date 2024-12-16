@@ -10,11 +10,13 @@
 
 class ReinforcementLearningAgent : public Agent {
 public:
-    ReinforcementLearningAgent(int playerId, double alpha = 0.1, double gamma = 0.9, double epsilon = 0.1);
+    ReinforcementLearningAgent(int playerId, double alpha = 0.1, double gamma = 0.9, double epsilon = 0.1, double epsilonDecay = 0.99, double minEpsilon = 0.1);
     int chooseMove(const MuTorereBoard& board) override;
     void updateQValues(int reward, const MuTorereBoard& oldBoard, int move, const MuTorereBoard& newBoard);
     void saveQValues(const std::string& filename) const;
     void loadQValues(const std::string& filename);
+    void decayEpsilon();
+
 
 
 
@@ -23,6 +25,8 @@ private:
     double alpha;  // Taux d’apprentissage
     double gamma;  // Facteur de discount
     double epsilon; // Paramètre pour l'exploration
+    double epsilonDecay;    // Decay rate for epsilon
+    double minEpsilon;      // Minimum value for epsilon
     int getBestMove(const MuTorereBoard& board);
     int getStateHash(const MuTorereBoard& board) const; // Fonction de hachage pour l’état
 };
