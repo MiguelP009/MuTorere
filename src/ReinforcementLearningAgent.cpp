@@ -11,11 +11,6 @@ int ReinforcementLearningAgent::chooseMove(const MuTorereBoard& board) {
     int state = getStateHash(board);
     std::vector<int> availableMoves = board.getAvailableMoves(playerId);
 
-    // Print available moves
-    // for (int i=0; i<availableMoves.size(); i++) {
-    //     std::cout << availableMoves[i] << " " << std::endl;
-    // }
-
     // Politique epsilon-greedy
     if ((double) rand() / RAND_MAX < epsilon) {
         // Exploration: choisir un mouvement aléatoire parmi ceux disponibles
