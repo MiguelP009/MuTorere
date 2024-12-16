@@ -126,7 +126,7 @@ mu-torere/
 ## Python Analysis Tool
 
 ### Description
-The `analysis_tool.py` script allows you to:
+The `ProcessData.py` script allows you to:
 - List and select result files from the `Data/Results` directory.
 - Visualize the total rewards and win rate over time.
 - Analyze learning trends with rolling averages.
@@ -134,7 +134,7 @@ The `analysis_tool.py` script allows you to:
 ### Usage
 1. Navigate to the project root directory:
    ```bash
-   python analysis_tool.py
+   python ProcessData.py
    ```
 
 2. A window will open, allowing you to:
